@@ -13,8 +13,9 @@
 #include "controller.h"
 #include "controllers/grade_controller.h"
 #include "controllers/updown_controller.h"
+#include "controllers/bpm_controller.h"
 // U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/12, /* cs=*/26, /* dc=*/27, /* reset=*/14);
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/16, /* data=*/17, /* reset=*/U8X8_PIN_NONE); // ESP32 Thing, pure SW emulated I2C
+   U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, /* clock=*/5, /* data=*/4 , /* reset=*/U8X8_PIN_NONE); // ESP32 Thing, pure SW emulated I2C
 
 class TestController : public Controller
 {
@@ -35,15 +36,27 @@ public:
 };
 Core core;
 TestController testController;
-GradeController gradeCtl(15, 18, 19);
-UpDownController upDownCtl(32, 33);
+GradeController gradeCtl(25, 22, 23);
+UpDownController upDownCtl(14, 27);
+BpmController bmpCtl(32,33);
+int tick = 0;
+void IRAM_ATTR isr()
+{
+  static int count = 0;
+  tick++;
+  // auto v = digitalRead(18);
+  Serial.print("get one = ");
+  Serial.println(count++);
+}
 void setup()
 {
   // write your initialization code here
   Serial.begin(115200);
   u8g2.begin();
+  core.AddController(&bmpCtl);
   core.AddController(&gradeCtl);
   core.AddController(&upDownCtl);
+  bmpCtl.Init();
   gradeCtl.Init();
   upDownCtl.Init();
   upDownCtl.On(UpDownEvent::UpOne, [&]()
@@ -54,28 +67,41 @@ void setup()
                { gradeCtl.DownOneGrade(); });
   upDownCtl.On(UpDownEvent::KeepUpOne, [&]()
                { gradeCtl.UpOneGrade(); });
+
+   //pinMode(23,OUTPUT);
+   //digitalWrite(23,HIGH);
+  // core.PeriodCall(2000,[](){
+  //   static int  a = 0;
+  //   digitalWrite(23,a++%2);
+  // });
 }
 
 void loop()
 {
   auto c = millis();
-    core.Poll(c);
+  core.Poll(c);
   delay(10);
   static int i = 0;
-  if (i++ % 50 == 0)
+  if (i++ % 10 == 0)
   {
     char output[50] = {0};
     char output1[50] = {0};
-    sprintf(output, "T:%d", gradeCtl.TargetGrade());
-    sprintf(output1, "C:%d", gradeCtl.CurrentGrade());
-
+    char timeOutput[50] = {0};
+    sprintf(output, "Level = %d", gradeCtl.TargetGrade());
+    sprintf(output1, "Rpm = %d", bmpCtl.Bpm());
+    auto time = millis()/1000;
+    auto hour = time/3600;
+    auto min = (time%3600)/60;
+    auto second = time%60;
+    sprintf(timeOutput,"Time = %d:%d:%d",hour,min,second);
     // Serial.println(output);
 
     u8g2.clearBuffer();                 // 清除内部缓冲区
     u8g2.setFont(u8g2_font_ncenB10_tr); // choose a suitable font
     u8g2.drawStr(0, 20, output);        // write something to the internal memory
     u8g2.drawStr(0, 40, output1);       // write something to the internal memory
-    u8g2.sendBuffer(); // transfer internal memory to the display
+    u8g2.drawStr(0, 60, timeOutput);       // write something to the internal memory
+    u8g2.sendBuffer();                  // transfer internal memory to the display
   };
   // write your code here
 }

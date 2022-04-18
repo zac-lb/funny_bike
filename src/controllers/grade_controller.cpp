@@ -56,7 +56,7 @@ int GradeController::Interval()
 
 void GradeController::Init()
 {
-    pinMode(_rPin, INPUT_PULLUP);
+    pinMode(_rPin, INPUT);
     pinMode(_relayPin1, OUTPUT);
     pinMode(_relayPin2, OUTPUT);
     _currentGrade = a2g(analogRead(_rPin));
@@ -70,17 +70,20 @@ void GradeController::changeRunState(RunState state)
         return;
     }
     else if (state == RunState::Up)
-    {
+    {   
+        Serial.println("start up");
         digitalWrite(_relayPin1, LOW);
         digitalWrite(_relayPin2, HIGH);
     }
     else if (state == RunState::Down)
     {
+        Serial.println("start down");
         digitalWrite(_relayPin1, HIGH);
         digitalWrite(_relayPin2, LOW);
     }
     else
     {
+        Serial.println("none");
         digitalWrite(_relayPin1, LOW);
         digitalWrite(_relayPin2, LOW);
     }
