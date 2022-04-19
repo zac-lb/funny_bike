@@ -10,7 +10,7 @@ void static callback(void *p)
     bpm->Add();
 }
 void BpmController::Poll(unsigned long time)
-{
+{                                                                                          
 }
 int BpmController::Interval()
 {

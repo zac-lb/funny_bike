@@ -8,7 +8,10 @@
 #include "../controller.h"
 #include "../core.h"
 
-class GradeController : public Controller {
+enum class GradeEvent{
+    Reset,
+};
+class GradeController : public EventController<GradeEvent> {
 
     enum class RunState{
         None = 0,
@@ -27,8 +30,6 @@ public:
     int DownOneGrade();
 
 public:
-    int CurrentGrade() const { return _currentGrade; }
-    int CurrentValue() const { return _currentValue; }
 
     int TargetGrade() const { return _targetGrade; }
 
@@ -36,17 +37,15 @@ public:
 
     void SetTargetGrade(int grade);
 
-
 private:
     void changeRunState(RunState state);
 private:
-    int _currentGrade = 0;
     int _targetGrade = 0;
     int _maxGrade = 20;
     int _rPin = -1;
     int _relayPin1 = -1;
     int _relayPin2 = -1;
-    int _currentValue = 0;
+    bool _stable = false;
 
     RunState _state = RunState::None;
 };

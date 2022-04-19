@@ -25,28 +25,29 @@ GradeController::GradeController(int anglePin, int relayPin1, int relayPin2)
 
 void GradeController::Poll(unsigned long time)
 {
-    auto rValue = analogRead(_rPin);
-    auto nowGrade = a2g(rValue);
-    _currentGrade = nowGrade;
-    _currentValue = rValue;
-    // Serial.print("nv=");
-    // Serial.println(rValue);
-    // Serial.print(",n=");
-    // Serial.print(nowGrade);
-    // Serial.print(",t=");
-    // Serial.println(_targetGrade);
-
-    if (_currentGrade > _targetGrade)
-    {
-        changeRunState(RunState::Down);
+    if(_stable){
+        return;
     }
-    else if (_currentGrade < _targetGrade)
-    {
-        changeRunState(RunState::Up);
-    }
-    else
-    {
-        changeRunState(RunState::None);
+    auto thresholdValue = threshold(_targetGrade);
+    auto nowValue = analogRead(_rPin);
+    if(_state == RunState::None){
+        if(std::abs(nowValue-thresholdValue)>TICK_PER_GRADE/2){
+            if(nowValue<thresholdValue){
+                changeRunState(RunState::Up);
+            }else{
+                changeRunState(RunState::Down);
+            }
+        }else{
+            _stable = true;
+        }
+    }else if(_state == RunState::Up){
+        if(nowValue>=thresholdValue){
+            changeRunState(RunState::None);
+        }
+    }else if(_state == RunState::Down){
+        if(nowValue<=thresholdValue){
+            changeRunState(RunState::None);
+        }
     }
 }
 
@@ -57,11 +58,11 @@ int GradeController::Interval()
 
 void GradeController::Init()
 {
-    pinMode(_rPin, INPUT_PULLUP);
+    pinMode(_rPin, INPUT_PULLDOWN);
     pinMode(_relayPin1, OUTPUT);
     pinMode(_relayPin2, OUTPUT);
-    _currentGrade = a2g(analogRead(_rPin));
-    _targetGrade = _currentGrade;
+    _targetGrade = 0;
+    _stable = false;
 }
 
 void GradeController::changeRunState(RunState state)
@@ -103,16 +104,16 @@ int GradeController::UpOneGrade()
 
 void GradeController::SetTargetGrade(int grade)
 {
-    if (grade > 0 && grade <= _maxGrade)
+    if (grade > 0 && grade <= _maxGrade&&_targetGrade!=grade)
     {
         _targetGrade = grade;
+        _stable = false;
         Poll(millis());
     }
 }
 
 int GradeController::DownOneGrade()
 {
-    Serial.println("down one grade");
     if (_targetGrade > 1)
     {
         SetTargetGrade(_targetGrade - 1);
