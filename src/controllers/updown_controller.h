@@ -29,6 +29,12 @@ public:
     void Poll(unsigned long time) override;
     int Interval() override;
     void Init() override;
+    int X(){
+        return _x;
+    }
+    int Y(){
+        return _y;
+    };
 private:
     int _xValue;
     State _state;
@@ -36,6 +42,8 @@ private:
     int _yPin;
     unsigned long _lastDownUpKeepTime = 0;
     bool _keeping = false;
+    int _x;
+    int _y;
 
     void processState(State newState,unsigned long now);
 };

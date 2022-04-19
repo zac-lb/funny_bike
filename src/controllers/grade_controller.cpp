@@ -28,6 +28,7 @@ void GradeController::Poll(unsigned long time)
     auto rValue = analogRead(_rPin);
     auto nowGrade = a2g(rValue);
     _currentGrade = nowGrade;
+    _currentValue = rValue;
     // Serial.print("nv=");
     // Serial.println(rValue);
     // Serial.print(",n=");
@@ -56,7 +57,7 @@ int GradeController::Interval()
 
 void GradeController::Init()
 {
-    pinMode(_rPin, INPUT);
+    pinMode(_rPin, INPUT_PULLUP);
     pinMode(_relayPin1, OUTPUT);
     pinMode(_relayPin2, OUTPUT);
     _currentGrade = a2g(analogRead(_rPin));

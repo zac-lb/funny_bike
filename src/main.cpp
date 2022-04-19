@@ -36,7 +36,7 @@ public:
 };
 Core core;
 TestController testController;
-GradeController gradeCtl(25, 22, 23);
+GradeController gradeCtl(34, 22, 23);
 UpDownController upDownCtl(14, 27);
 BpmController bmpCtl(32,33);
 int tick = 0;
@@ -84,11 +84,13 @@ void loop()
   static int i = 0;
   if (i++ % 10 == 0)
   {
-    char output[50] = {0};
-    char output1[50] = {0};
+    char gradeOutput[50] = {0};
+    char rmpOutput[50] = {0};
+    char xyOutput[50] = {0};
     char timeOutput[50] = {0};
-    sprintf(output, "Level = %d", gradeCtl.TargetGrade());
-    sprintf(output1, "Rpm = %d", bmpCtl.Bpm());
+    sprintf(gradeOutput, "Level = %d,V= %d", gradeCtl.TargetGrade(),gradeCtl.CurrentValue());
+    sprintf(rmpOutput, "Rpm = %d,C = %d", bmpCtl.Bpm(),bmpCtl.Count());
+    sprintf(xyOutput,"X = %d",upDownCtl.X());
     auto time = millis()/1000;
     auto hour = time/3600;
     auto min = (time%3600)/60;
@@ -97,9 +99,10 @@ void loop()
     // Serial.println(output);
 
     u8g2.clearBuffer();                 // 清除内部缓冲区
-    u8g2.setFont(u8g2_font_ncenB10_tr); // choose a suitable font
-    u8g2.drawStr(0, 20, output);        // write something to the internal memory
-    u8g2.drawStr(0, 40, output1);       // write something to the internal memory
+    u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
+    u8g2.drawStr(0, 15, gradeOutput);        // write something to the internal memory
+    u8g2.drawStr(0, 30, rmpOutput);       // write something to the internal memory
+    u8g2.drawStr(0, 45, xyOutput);       // write something to the internal memory
     u8g2.drawStr(0, 60, timeOutput);       // write something to the internal memory
     u8g2.sendBuffer();                  // transfer internal memory to the display
   };

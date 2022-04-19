@@ -28,6 +28,7 @@ public:
 
 public:
     int CurrentGrade() const { return _currentGrade; }
+    int CurrentValue() const { return _currentValue; }
 
     int TargetGrade() const { return _targetGrade; }
 
@@ -45,6 +46,7 @@ private:
     int _rPin = -1;
     int _relayPin1 = -1;
     int _relayPin2 = -1;
+    int _currentValue = 0;
 
     RunState _state = RunState::None;
 };

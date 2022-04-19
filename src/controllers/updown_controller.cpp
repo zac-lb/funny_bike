@@ -104,6 +104,7 @@ void UpDownController::processState(State newState,unsigned long time){
 void UpDownController::Poll(unsigned long time) {
     auto x = analogRead(_xPin);
     auto newState = x2s(x);
+    _x = x;
     processState(newState,time);
 }
 
