@@ -37,6 +37,8 @@ public:
 
     void SetTargetGrade(int grade);
 
+    int CurrentValue();
+
 private:
     void changeRunState(RunState state);
 private:

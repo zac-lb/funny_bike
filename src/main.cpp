@@ -53,6 +53,7 @@ void setup()
   // write your initialization code here
   Serial.begin(115200);
   u8g2.begin();
+  u8g2.enableUTF8Print(); // 使print支持UTF8字集
   core.AddController(&bmpCtl);
   core.AddController(&gradeCtl);
   core.AddController(&upDownCtl);
@@ -88,22 +89,32 @@ void loop()
     char rmpOutput[50] = {0};
     char xyOutput[50] = {0};
     char timeOutput[50] = {0};
-    sprintf(gradeOutput, "Level = %d,V= %d", gradeCtl.TargetGrade(),gradeCtl.CurrentValue());
-    sprintf(rmpOutput, "Rpm = %d,C = %d", bmpCtl.Bpm(),bmpCtl.Count());
-    sprintf(xyOutput,"X = %d",upDownCtl.X());
+    sprintf(gradeOutput, "L = %d", gradeCtl.TargetGrade());
+    sprintf(rmpOutput, "R = %d", bmpCtl.Bpm());
+    // sprintf(gradeOutput, "L = %d,V= %d", gradeCtl.TargetGrade(),gradeCtl.CurrentValue());
+    // sprintf(rmpOutput, "R = %d,C = %d", bmpCtl.Bpm(),bmpCtl.Count());
+    // sprintf(xyOutput,"X = %d",upDownCtl.X());
     auto time = millis()/1000;
     auto hour = time/3600;
     auto min = (time%3600)/60;
     auto second = time%60;
-    sprintf(timeOutput,"Time = %d:%d:%d",hour,min,second);
+    sprintf(timeOutput,"T = %d:%d:%d",hour,min,second);
     // Serial.println(output);
 
     u8g2.clearBuffer();                 // 清除内部缓冲区
-    u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
-    u8g2.drawStr(0, 15, gradeOutput);        // write something to the internal memory
-    u8g2.drawStr(0, 30, rmpOutput);       // write something to the internal memory
-    u8g2.drawStr(0, 45, xyOutput);       // write something to the internal memory
+    u8g2.setFont(u8g2_font_ncenB12_tr); // choose a suitable font
+    u8g2.drawStr(0, 20, gradeOutput);        // write something to the internal memory
+    u8g2.drawStr(0, 40, rmpOutput);       // write something to the internal memory
+ //   u8g2.drawStr(0, 45, xyOutput);       // write something to the internal memory
     u8g2.drawStr(0, 60, timeOutput);       // write something to the internal memory
+  //     u8g2.setFont(u8g2_font_wqy12_t_chinese2);  // use wqy chinese2 for all the glyphs of "你好世界"
+  // u8g2.setFontDirection(0);
+  // u8g2.clearBuffer();
+  // u8g2.setCursor(0, 15);
+  // u8g2.print("Hello World!");
+  // u8g2.setCursor(0, 40);
+  // u8g2.print("你好世界");		// Chinese "Hello World" 
+  // u8g2.sendBuffer();
     u8g2.sendBuffer();                  // transfer internal memory to the display
   };
   // write your code here

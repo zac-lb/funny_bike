@@ -5,7 +5,7 @@
 #include "grade_controller.h"
 
 #define TICK_PER_GRADE 200
-#define MAX_VALUE 4000
+#define MAX_VALUE 3200
 int a2g(int a)
 {
     return (a - TICK_PER_GRADE + 1) / TICK_PER_GRADE + 1;
@@ -61,7 +61,7 @@ void GradeController::Init()
     pinMode(_rPin, INPUT_PULLDOWN);
     pinMode(_relayPin1, OUTPUT);
     pinMode(_relayPin2, OUTPUT);
-    _targetGrade = 0;
+    _targetGrade = 1;
     _stable = false;
 }
 
@@ -111,7 +111,9 @@ void GradeController::SetTargetGrade(int grade)
         Poll(millis());
     }
 }
-
+int GradeController::CurrentValue(){
+    return analogRead(_rPin);
+}
 int GradeController::DownOneGrade()
 {
     if (_targetGrade > 1)
